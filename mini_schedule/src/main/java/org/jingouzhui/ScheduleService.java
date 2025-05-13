@@ -26,20 +26,18 @@ public class ScheduleService {
      * @param delayTime 延迟时间
      * @param timeUnit  时间单位
      */
-    public void schedule(Runnable task, long delayTime, TimeUnit timeUnit) {
+    public Job schedule(Runnable task, long delayTime, TimeUnit timeUnit) {
+        CancellationToken cancellationToken = new CancellationToken();
         Job job = Job.JobBuilder.builder()
                 .task(task)
                 .delayTime(delayTime)
                 .timeUnit(timeUnit)
                 .startTime(System.currentTimeMillis() + TimeUnit.MILLISECONDS.convert(delayTime, timeUnit))
+                .cancellationToken(cancellationToken)
                 .build();
-    /*    Job job = new Job();
-        job.setTask(task);
-        job.setDelayTime(delayTime);
-        job.setTimeUnit(timeUnit);
-        job.setStartTime(System.currentTimeMillis() + TimeUnit.MILLISECONDS.convert(delayTime, timeUnit));*/
         trigger.jobQueue.offer(job);
         trigger.wakeUp();
+        return job;
     }
 
 
@@ -56,9 +54,17 @@ public class ScheduleService {
                 }
                 //job1     job1和job2不一定是同一个，在多线程的情况下可能在52行判断结束后加入了新的任务
                 Job job = jobQueue.peek();
-                if (job.getStartTime() < System.currentTimeMillis()) {
+                long currentTime = System.currentTimeMillis();
+                if (job.getStartTime() < currentTime) {
+
                     //job2
                     job = jobQueue.poll();
+                    if (job == null) {
+                        continue;
+                    }
+                    if (job.getCancellationToken().isCancelled()) {
+                        continue;
+                    }
                     executor.execute(job.getTask());
                     //   Job nextJob = new Job(job.getTask(), System.currentTimeMillis() + TimeUnit.MILLISECONDS.convert(job.getDelayTime(), job.getTimeUnit()), job.getDelayTime(),job.getTimeUnit());
                     Job nextJob = Job.JobBuilder
@@ -67,9 +73,12 @@ public class ScheduleService {
                             .startTime(System.currentTimeMillis() + TimeUnit.MILLISECONDS.convert(job.getDelayTime(), job.getTimeUnit()))
                             .delayTime(job.getDelayTime())
                             .timeUnit(job.getTimeUnit())
+                            .cancellationToken(job.getCancellationToken())
                             .build();
 
-                    jobQueue.add(nextJob);
+                    if (!nextJob.getCancellationToken().isCancelled()) {
+                        jobQueue.add(nextJob);
+                    }
                 } else {
                     //park直到到达执行时间
                     LockSupport.parkUntil(job.getStartTime());

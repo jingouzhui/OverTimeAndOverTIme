@@ -17,11 +17,14 @@ public class Job implements Comparable<Job> {
 
     private TimeUnit timeUnit;
 
-    public Job(Runnable task, long startTime, long delayTime, TimeUnit timeUnit) {
+    private CancellationToken cancellationToken;
+
+    public Job(Runnable task, long startTime, long delayTime, TimeUnit timeUnit, CancellationToken cancellationToken) {
         this.task = task;
         this.startTime = startTime;
         this.delayTime = delayTime;
         this.timeUnit = timeUnit;
+        this.cancellationToken = cancellationToken;
     }
 
     public Job() {
@@ -59,9 +62,23 @@ public class Job implements Comparable<Job> {
         this.timeUnit = timeUnit;
     }
 
+    public CancellationToken getCancellationToken() {
+        return cancellationToken;
+    }
+    public void setCancellationToken(CancellationToken cancellationToken) {
+        this.cancellationToken = cancellationToken;
+    }
+
     @Override
     public int compareTo(Job o) {
         return Long.compare(this.startTime, o.startTime);
+    }
+
+    /**
+     * 中断任务
+     */
+    public void cancel(){
+        this.getCancellationToken().cancel();
     }
 
     static class JobBuilder{
@@ -69,6 +86,7 @@ public class Job implements Comparable<Job> {
         private long startTime;
         private long delayTime;
         private TimeUnit timeUnit;
+        private CancellationToken cancellationToken;
 
         public  static  JobBuilder builder() {
             return new JobBuilder();
@@ -89,8 +107,12 @@ public class Job implements Comparable<Job> {
             this.timeUnit = timeUnit;
             return this;
         }
+        public JobBuilder cancellationToken(CancellationToken cancellationToken) {
+            this.cancellationToken = cancellationToken;
+            return this;
+        }
         public Job build() {
-            return new Job(task, startTime, delayTime, timeUnit);
+            return new Job(task, startTime, delayTime, timeUnit, cancellationToken);
         }
 
     }
