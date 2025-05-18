@@ -3,7 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/OverTimeAndOverTime.iml" filepath="$PROJECT_DIR$/.idea/OverTimeAndOverTime.iml" />
-      <module fileurl="file://$PROJECT_DIR$/mini_schedule.iml" filepath="$PROJECT_DIR$/mini_schedule.iml" />
+      <module fileurl="file://$PROJECT_DIR$/DesignModeOfStrategy/startegy.iml" filepath="$PROJECT_DIR$/DesignModeOfStrategy/startegy.iml" />
     </modules>
   </component>
 </project>
