@@ -28,7 +28,9 @@ public class TestByteBufferDemo {
         //byteBufferDemo3();
         //byteBufferDemo4();
         //byteBufferDemo5();
-        byteBufferDemo6();
+       // byteBufferDemo6();
+        //byteBufferDemo7();
+        byteBufferDemo8();
     }
 
     public static void byteBufferDemo1() {
@@ -183,5 +185,49 @@ public class TestByteBufferDemo {
         //切换为写模式 由于有黏包和半包 所以不能使用clear
         buffer.compact();
     }
+
+    /**
+     * 文件传输功能
+     */
+    public static void byteBufferDemo7() {
+        try (FileChannel from = new FileInputStream(C1_FILE_DIR + "from.txt").getChannel();
+             FileChannel to = new FileOutputStream(C1_FILE_DIR + "to.txt").getChannel();) {
+                long startTime = System.currentTimeMillis();
+            logger.info("开始时间:{}",startTime);
+            //效率高  底层使用零拷贝优化
+            from.transferTo(0,from.size(),to);
+            long endTime = System.currentTimeMillis();
+            logger.info("结束时间:{}",endTime);
+            logger.info("花费时间:{}",(endTime-startTime));
+        } catch (Exception e) {
+            logger.error("传输异常",e);
+        }
+
+    }
+
+    /**
+     * 当文件大小超过2g时
+     */
+    public static void byteBufferDemo8() {
+        try (FileChannel from = new FileInputStream(C1_FILE_DIR + "from.txt").getChannel();
+             FileChannel to = new FileOutputStream(C1_FILE_DIR + "to.txt").getChannel();) {
+            long startTime = System.currentTimeMillis();
+            logger.info("开始时间:{}",startTime);
+            //效率高  底层使用零拷贝优化
+            long size = from.size();
+            for (long left = size; left >0;){
+                logger.info("position:{},left:{}",size - left,left);
+               left -= from.transferTo(size - left,left,to);
+
+            }
+            long endTime = System.currentTimeMillis();
+            logger.info("结束时间:{}",endTime);
+            logger.info("花费时间:{}",(endTime-startTime));
+        } catch (Exception e) {
+            logger.error("传输异常",e);
+        }
+
+    }
+
 
 }
