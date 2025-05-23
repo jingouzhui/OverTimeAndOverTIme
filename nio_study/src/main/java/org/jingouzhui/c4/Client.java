@@ -1,0 +1,18 @@
+package org.jingouzhui.c4;
+
+import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.nio.channels.SocketChannel;
+
+/**
+ * @description:
+ * @author: jingouzhui
+ * @date: 2025/5/23 14:33
+ */
+public class Client {
+    public static void main(String[] args) throws IOException {
+        SocketChannel sc = SocketChannel.open();
+        sc.connect(new InetSocketAddress("127.0.0.1", 8881));
+        System.out.println("waiting for connection");
+    }
+}
