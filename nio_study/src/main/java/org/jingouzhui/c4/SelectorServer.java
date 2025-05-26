@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import static org.jingouzhui.ByteBufferUtil.debugAll;
 import static org.jingouzhui.ByteBufferUtil.debugRead;
 
 /**
@@ -20,6 +21,9 @@ import static org.jingouzhui.ByteBufferUtil.debugRead;
  */
 public class SelectorServer {
     private static final Logger log = LoggerFactory.getLogger(SelectorServer.class);
+
+    private static boolean totalMsg = false;
+   private static ByteBuffer byteBuffer = ByteBuffer.allocate(16);
 
     public static void main(String[] args) throws IOException {
         //创建selector
@@ -53,15 +57,16 @@ public class SelectorServer {
                     log.info("socketChannel:{}", socketChannel);
                 } else if (key.isReadable()) {
                     SocketChannel channel = (SocketChannel) key.channel();
-                    ByteBuffer byteBuffer = ByteBuffer.allocate(16);
+                    //ByteBuffer byteBuffer = java.nio.ByteBuffer.allocate(16);
                     try {
                         int read = channel.read(byteBuffer);
                         if (read == -1) {
                             log.info("客户端正常关闭");
                             key.cancel();
                         } else {
-                            byteBuffer.flip();
-                            debugRead(byteBuffer);
+                           /* byteBuffer.flip();
+                            debugRead(byteBuffer);*/
+                            split(byteBuffer);
                         }
                     } catch (IOException e) {
                         log.info("客户端强制断开", e);
@@ -74,5 +79,29 @@ public class SelectorServer {
             }
 
         }
+    }
+    private static void split(ByteBuffer buffer) {
+        totalMsg = false;
+        //切换为读模式
+        buffer.flip();
+        for(int i = 0; i < buffer.limit(); i++) {
+            if (buffer.get(i) == '\n') {
+                totalMsg = true;
+                int split = i + 1 - buffer.position();
+                ByteBuffer target = java.nio.ByteBuffer.allocate(split);
+                for (int j = 0; j < split; j++) {
+                    target.put(buffer.get());
+                }
+                debugAll(target);
+            }
+        }
+        if(! totalMsg){
+
+           ByteBuffer newByteBuffer = ByteBuffer.allocate(buffer.capacity() * 2);
+           newByteBuffer.put(buffer);
+            byteBuffer = newByteBuffer;
+        }
+        //切换为写模式，由于存在半包黏包现象所以使用compact
+        buffer.compact();
     }
 }
