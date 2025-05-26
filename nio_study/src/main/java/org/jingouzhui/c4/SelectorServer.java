@@ -22,9 +22,6 @@ import static org.jingouzhui.ByteBufferUtil.debugRead;
 public class SelectorServer {
     private static final Logger log = LoggerFactory.getLogger(SelectorServer.class);
 
-    private static boolean totalMsg = false;
-   private static ByteBuffer byteBuffer = ByteBuffer.allocate(16);
-
     public static void main(String[] args) throws IOException {
         //创建selector
         Selector selector = Selector.open();
@@ -52,21 +49,28 @@ public class SelectorServer {
                     ServerSocketChannel channel = (ServerSocketChannel) key.channel();
                     SocketChannel socketChannel = channel.accept();
                     socketChannel.configureBlocking(false);
-                    SelectionKey scKey = socketChannel.register(selector, 0, null);
+                    ByteBuffer buffer = ByteBuffer.allocate(16);
+                    //将buffer作为附件关联到selectKey上
+                    SelectionKey scKey = socketChannel.register(selector, 0, buffer);
                     scKey.interestOps(SelectionKey.OP_READ);
                     log.info("socketChannel:{}", socketChannel);
                 } else if (key.isReadable()) {
                     SocketChannel channel = (SocketChannel) key.channel();
-                    //ByteBuffer byteBuffer = java.nio.ByteBuffer.allocate(16);
+                    ByteBuffer buffer = (ByteBuffer) key.attachment();
                     try {
-                        int read = channel.read(byteBuffer);
+                        int read = channel.read(buffer);
                         if (read == -1) {
                             log.info("客户端正常关闭");
                             key.cancel();
                         } else {
-                           /* byteBuffer.flip();
-                            debugRead(byteBuffer);*/
-                            split(byteBuffer);
+                            split(buffer);
+                            //扩容
+                            if (buffer.position() == buffer.limit()) {
+                                ByteBuffer newByteBuffer = ByteBuffer.allocate(buffer.capacity() * 2);
+                                buffer.flip();
+                                newByteBuffer.put(buffer);
+                                key.attach(newByteBuffer);
+                            }
                         }
                     } catch (IOException e) {
                         log.info("客户端强制断开", e);
@@ -81,12 +85,10 @@ public class SelectorServer {
         }
     }
     private static void split(ByteBuffer buffer) {
-        totalMsg = false;
         //切换为读模式
         buffer.flip();
         for(int i = 0; i < buffer.limit(); i++) {
             if (buffer.get(i) == '\n') {
-                totalMsg = true;
                 int split = i + 1 - buffer.position();
                 ByteBuffer target = java.nio.ByteBuffer.allocate(split);
                 for (int j = 0; j < split; j++) {
@@ -94,12 +96,6 @@ public class SelectorServer {
                 }
                 debugAll(target);
             }
-        }
-        if(! totalMsg){
-
-           ByteBuffer newByteBuffer = ByteBuffer.allocate(buffer.capacity() * 2);
-           newByteBuffer.put(buffer);
-            byteBuffer = newByteBuffer;
         }
         //切换为写模式，由于存在半包黏包现象所以使用compact
         buffer.compact();
