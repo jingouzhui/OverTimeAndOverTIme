@@ -31,7 +31,7 @@ public class SelectorServer {
         SelectionKey sscKey = ssc.register(selector, 0, null);
         //key只关注accept事件
         sscKey.interestOps(SelectionKey.OP_ACCEPT);
-        log.info("register Key:{}",sscKey);
+        log.info("register Key:{}", sscKey);
         //绑定监听端口
         ssc.bind(new InetSocketAddress(8881));
 
@@ -43,20 +43,31 @@ public class SelectorServer {
             while (iterator.hasNext()) {
                 SelectionKey key = iterator.next();
                 iterator.remove();
-                log.info("key:{}",key);
+                log.info("key:{}", key);
                 if (key.isAcceptable()) {
                     ServerSocketChannel channel = (ServerSocketChannel) key.channel();
                     SocketChannel socketChannel = channel.accept();
                     socketChannel.configureBlocking(false);
                     SelectionKey scKey = socketChannel.register(selector, 0, null);
                     scKey.interestOps(SelectionKey.OP_READ);
-                    log.info("socketChannel:{}",socketChannel);
-                }else if(key.isReadable()){
+                    log.info("socketChannel:{}", socketChannel);
+                } else if (key.isReadable()) {
                     SocketChannel channel = (SocketChannel) key.channel();
                     ByteBuffer byteBuffer = ByteBuffer.allocate(16);
-                    channel.read(byteBuffer);
-                    byteBuffer.flip();
-                    debugRead(byteBuffer);
+                    try {
+                        int read = channel.read(byteBuffer);
+                        if (read == -1) {
+                            log.info("客户端正常关闭");
+                            key.cancel();
+                        } else {
+                            byteBuffer.flip();
+                            debugRead(byteBuffer);
+                        }
+                    } catch (IOException e) {
+                        log.info("客户端强制断开", e);
+                        //因为客户端断开了 所以要要key从取消,从selector的keys集合中删除该key，否则下次会继续认为有事业发生了
+                        key.cancel();
+                    }
                 }
 
 
