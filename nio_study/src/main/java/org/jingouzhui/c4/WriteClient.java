@@ -23,7 +23,6 @@ public class WriteClient {
 
         int count = 0;
         while(true) {
-
             count += sc.read(buffer);
             log.info(String.valueOf(count));
             buffer.clear();
