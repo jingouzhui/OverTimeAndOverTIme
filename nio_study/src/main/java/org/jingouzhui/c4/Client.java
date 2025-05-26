@@ -3,6 +3,7 @@ package org.jingouzhui.c4;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.channels.SocketChannel;
+import java.nio.charset.StandardCharsets;
 
 /**
  * @description:
@@ -14,5 +15,6 @@ public class Client {
         SocketChannel sc = SocketChannel.open();
         sc.connect(new InetSocketAddress("127.0.0.1", 8881));
         System.out.println("waiting for connection");
+       // sc.write(StandardCharsets.UTF_8.encode("hello1"));
     }
 }
