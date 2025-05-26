@@ -17,7 +17,7 @@ public class Client {
         sc.write(StandardCharsets.UTF_8.encode("helloworld1234567890\nabc"));
         sc.write(StandardCharsets.UTF_8.encode("123"));
         sc.write(StandardCharsets.UTF_8.encode("sadf123\n"));
-        System.out.println("waiting for connection");
+        System.in.read();
 
     }
 }
