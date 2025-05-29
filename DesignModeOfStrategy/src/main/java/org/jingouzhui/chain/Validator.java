@@ -46,7 +46,7 @@ private ValidatorChain buildValidatorChain(Field field){
 
     public static void main(String[] args) throws IllegalAccessException {
         Validator validator = new Validator();
-        User user = new User(18,"zaxqa");
+        User user = new User(26,"jingouzhui");
         validator.validate(user);
     }
 }

@@ -10,7 +10,7 @@ import org.jingouzhui.chain.annotation.Min;
  * @date: 2025/5/29 17:16
  */
 public class User {
-    @Min(18)
+    @Min(30)
     @Max(25)
     private Integer age;
 

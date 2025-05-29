@@ -12,11 +12,12 @@ public class MaxValidateHandler implements ValidateHandler{
         this.max = max;
     }
     @Override
-    public void doValidate(Object value) {
+    public void doValidate(Object value,ValidatorContext context) {
         if(value instanceof Integer){
             if(((Integer)value).intValue() > max){
-                throw  new ValidateException("Age is greater than " + max);
+                context.appendErrorMsg("Age is greater than " + max);
             }
+            context.doNext(value);
 
         }
     }

@@ -13,13 +13,14 @@ public class MinValidateHandler implements ValidateHandler {
     }
 
     @Override
-    public void doValidate(Object value) {
+    public void doValidate(Object value,ValidatorContext context) {
         if (value instanceof Integer) {
             Integer i = (Integer) value;
             if (i < min) {
-                throw new ValidateException("Age is less than " + min);
+                context.appendErrorMsg("Age is less than " + min);
 
             }
+            context.doNext(value);
         }
     }
 }
