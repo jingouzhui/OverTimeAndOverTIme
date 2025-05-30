@@ -13,6 +13,7 @@
         <option value="$PROJECT_DIR$/DesignModeOfStrategy/pom.xml" />
         <option value="$PROJECT_DIR$/composite_calculator/pom.xml" />
         <option value="$PROJECT_DIR$/nio_study/pom.xml" />
+        <option value="$PROJECT_DIR$/rpc_study/pom.xml" />
       </list>
     </option>
   </component>

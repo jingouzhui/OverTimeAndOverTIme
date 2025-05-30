@@ -14,6 +14,7 @@ public class ValidatorChain {
 
 
 
+
     public void validate(Object value) throws ValidateException {
          ValidatorContext context = new ValidatorContext(value);
         while (true) {

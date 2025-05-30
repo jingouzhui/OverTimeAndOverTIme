@@ -10,6 +10,7 @@
         <module name="nio_study" />
         <module name="mini_schedule" />
         <module name="composite_calculator" />
+        <module name="rpc_study" />
       </profile>
       <profile name="Annotation profile for DesignModeOfStrategy" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
