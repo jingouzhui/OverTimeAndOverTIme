@@ -184,6 +184,13 @@ public class Student implements Serializable {
         address.setProvince("重庆市");
         address.setDistrict("北碚区");
         address.setDetail("天生路2号西南大学");
+       /* Student student = new Student.StudentBuilder()
+                .no(123)
+                .name("jingouzhui-json")
+                .age(16)
+                .score(100)
+                .address(address)
+                .build();*/
         Student student = Student.builder()
                 .no(123)
                 .name("jingouzhui-json")
