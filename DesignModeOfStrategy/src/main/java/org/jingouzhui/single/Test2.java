@@ -46,6 +46,17 @@ public class Test2 {
 
         System.out.println(singleton2_2==instance);
 
+        //枚举实现的单例模式  好处
+        //1.简单 2.线程安全 3.不会被反序列化破坏
+        Singleton3 instance1 = Singleton3.INSTANCE;
+        ObjectOutputStream oos1 = new ObjectOutputStream(Files.newOutputStream(Paths.get("singleton3.txt")));
+        oos1.writeObject(instance1);
+        oos1.flush();
+        oos1.close();
+        ObjectInputStream ois1 = new ObjectInputStream(Files.newInputStream(Paths.get("singleton3.txt")));
+        Singleton3 singleton3 = (Singleton3) ois1.readObject();
+        System.out.println(singleton3==instance1);
+
 
     }
 }
