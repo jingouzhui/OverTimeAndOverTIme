@@ -16,6 +16,8 @@ import java.nio.file.Files;
 
 @JsonDeserialize(builder = Student.StudentBuilder.class)
 public class Student implements Serializable {
+    private static final long serialVersionUID = -4392658638228508589L;
+
     //学号
     private int no;
     //姓名
@@ -140,11 +142,65 @@ public class Student implements Serializable {
      * @throws IOException
      */
     public static void main(String[] args) throws IOException, ClassNotFoundException {
-      jdkSerialize();
-        jsonSerialize();
-        hessianSerialize();
+//      jdkSerialize();
+//        jsonSerialize();
+//        hessianSerialize();
+        jdkSerialize_1();
+        jdkSerialize_2();
+
 
     }
+
+    public static  void jdkSerialize_1() throws IOException, ClassNotFoundException {
+
+        String home = System.getProperty("user.home");
+        String basePath = home + "/Desktop";
+        File file = new File(basePath + "/student1.txt");
+        FileOutputStream fos = new FileOutputStream(file);
+        Address address = new Address();
+        address.setCity("重庆");
+        address.setProvince("重庆市");
+        address.setDistrict("北碚区");
+        address.setDetail("天生路2号西南大学");
+        Student jingouzhui = Student.builder()
+                .no(123)
+                .name("jingouzhui")
+                .age(16)
+                .score(101)
+                .address(address)
+                .build();
+        ObjectOutputStream oos = new ObjectOutputStream(fos);
+
+        oos.writeObject(jingouzhui);
+        oos.flush();
+        oos.close();
+        System.out.println("jdk序列化占用字节:"+file.length());
+
+    }
+    public static  void jdkSerialize_2() throws IOException, ClassNotFoundException {
+
+
+        String home = System.getProperty("user.home");
+        String basePath = home + "/Desktop";
+
+        FileInputStream fis = new FileInputStream(basePath + "/student1.txt");
+        ObjectInputStream ois = new ObjectInputStream(fis);
+        Student deJingouzhui = (Student) ois.readObject();
+        ois.close();
+        System.out.println(deJingouzhui);
+    }
+
+    private void readObject(ObjectInputStream inputStream) throws IOException, ClassNotFoundException {
+        inputStream.defaultReadObject();
+        if (score > 100 || score < 0) {
+            throw new IllegalArgumentException("分数不能小于0或者大于100");
+        }
+
+    }
+
+
+
+
     public static  void jdkSerialize() throws IOException, ClassNotFoundException {
 
         String home = System.getProperty("user.home");
