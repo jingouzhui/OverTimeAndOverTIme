@@ -6,7 +6,8 @@ package org.jingouzhui.observer;
  * @date: 2025/6/3 23:34
  */
 public class Main {
-
+        //观察者模式  事件生成者 直接去通知--> 事件消费者
+        //发布订阅模式 事件生成者 -->总线-->事件消费者  解耦了生产者和消费者 他们彼此不知道自己的存在
     public static void main(String[] args) throws InterruptedException {
 
         TVStation tv  = new TVStation();
@@ -23,8 +24,8 @@ public class Main {
             }
         });
 
-        tv.subscribe(xiaohan);
-        tv.subscribe(xiaoquan);
+        tv.subscribe(xiaohan,WeatherUpdateEvent.class);
+        tv.subscribe(xiaoquan,WeatherUpdateEvent.class);
         WeatherStation ws = new WeatherStation(tv);
         ws.start();
     }
