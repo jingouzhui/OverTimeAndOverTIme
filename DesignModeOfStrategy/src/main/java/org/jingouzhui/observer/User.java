@@ -7,7 +7,7 @@ import java.util.function.Consumer;
  * @author: jingouzhui
  * @date: 2025/6/3 23:35
  */
-public class User {
+public class User  implements EventListener {
     private final String name;
 
     private Consumer<String> consumer;
@@ -20,5 +20,13 @@ public class User {
 
     public void receiveInfo(String info) {
         consumer.accept(info);
+    }
+
+    @Override
+    public void onEvent(Event event) {
+        if ( event instanceof  WeatherUpdateEvent) {
+           receiveInfo(event.source().toString());
+        }
+
     }
 }

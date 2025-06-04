@@ -9,14 +9,14 @@ import java.util.Set;
  * @author: jingouzhui
  * @date: 2025/6/3 23:34
  */
+//气象站只负责生成消息 封装成事件 交给电视台发布事件
 public class WeatherStation {
 
-    private Set<User> users = new HashSet<>();
+  private TVStation tvStation;
 
-
-    public void subsribe(User user) {
-        users.add(user);
-    }
+  public WeatherStation(TVStation tvStation) {
+      this.tvStation = tvStation;
+  }
 
     /**
      * 返回天气信息
@@ -35,16 +35,12 @@ public class WeatherStation {
      * @throws InterruptedException
      */
     public void start() throws InterruptedException {
-        /**
-         * 当前气象站的责任过重 不符合单一责任原则  TODO 修改
-         */
+
         while (true) {
             //1.生成事件
             String info = getInfo();
-            for (User user : users) {
-                //2.通知所有订阅事件的用户
-                user.receiveInfo(info);
-            }
+            WeatherUpdateEvent updateEvent = new WeatherUpdateEvent(info);
+            tvStation.publish(updateEvent);
             Thread.sleep(3000);
         }
     }
