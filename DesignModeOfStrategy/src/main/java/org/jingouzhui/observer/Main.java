@@ -8,6 +8,8 @@ package org.jingouzhui.observer;
 public class Main {
 
     public static void main(String[] args) throws InterruptedException {
+
+        TVStation tv  = new TVStation();
         User xiaohan = new User("xiaohan",(info)-> {
             if (info.equals("雨天")) {
                 System.out.println("下雨啦，xiaohan出去玩");
@@ -21,9 +23,9 @@ public class Main {
             }
         });
 
-        WeatherStation ws = new WeatherStation();
-        ws.subsribe(xiaohan);
-        ws.subsribe(xiaoquan);
+        tv.subsribe(xiaohan);
+        tv.subsribe(xiaoquan);
+        WeatherStation ws = new WeatherStation(tv);
         ws.start();
     }
 }
